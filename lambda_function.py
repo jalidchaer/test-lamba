@@ -26,7 +26,7 @@ def lambda_handler(event, context):
     if response.status == 200:
         data = json.loads(response.read().decode('utf-8'))
         price = data['data']['BTC']['quote']['USD']['price']
-        timestamp = time.time()
+        last_updated = data['data']['BTC']['quote']['USD']['last_updated']
        # Conectar a la base de datos
    
         conn = pymysql.connect(
@@ -37,7 +37,7 @@ def lambda_handler(event, context):
            )
 
         with conn.cursor() as cursor:
-           cursor.execute("INSERT INTO bitcoin_prices (timestamp, price) VALUES (NOW(), %s)", (price,))
+           cursor.execute("INSERT INTO bitcoin_prices (price, last_updated) VALUES (%s, %s)", (price, last_updated))
            conn.commit()
 
         conn.close()
